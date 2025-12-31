@@ -2,6 +2,12 @@ body {
 	background-color: #0D0D08;
 	margin: 0;
 	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+#filters {
+	flex: 1;
 }
 
 #webgl-bg {
@@ -15,15 +21,17 @@ body {
 }
 
 p.title-bar {
-	font: bold 36px monospace;
+	font: bold 36px 'Orbitron', monospace;
 	text-align: center;
 	color: #008080;
+	margin-bottom: 10px;
 }
 
 p.subtitle {
-	font: italic 20px sans-serif;
+	font: italic 20px 'Rubik', sans-serif;
 	text-align: center;
 	color: #008080;
+	margin-top: 0;
 }
 
 .track-columns {
@@ -49,10 +57,19 @@ p.subtitle {
 	}
 }
 
-.track-column h3 {
-	font: bold 18px monospace;
+.track-column h3,
+.track-section h3 {
+	font: bold 18px 'Orbitron', monospace;
 	color: #008080;
 	margin-bottom: 0.5rem;
+}
+
+.track-section {
+	margin-bottom: 2rem;
+}
+
+.track-section:last-child {
+	margin-bottom: 0;
 }
 
 .content_filter ul {
@@ -66,7 +83,7 @@ p.subtitle {
 }
 
 .coming-soon {
-	font: italic 20px sans-serif;
+	font: 12px 'Rubik', sans-serif;
 	color: #008080;
 }
 
@@ -75,16 +92,16 @@ p.subtitle {
 	border: 3px double #008080;
 	border-radius: 8px;
 	padding: 4px 8px;
-	font: bold 16px monospace;
+	font: bold 16px 'Rubik', sans-serif;
 	cursor: pointer;
 	color: #008080;
-	box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+	box-shadow: 2px 2px 4px #999999;
 }
 
 .track-btn:hover {
 	color: #FFD700;
 	border-color: #FFD700;
-	box-shadow: 2px 2px 6px rgba(255, 215, 0, 0.3);
+	box-shadow: 2px 2px 6px #999999;
 }
 
 .track-active .track-btn {
@@ -148,4 +165,15 @@ p.subtitle {
 	left: 0;
 	top: 0;
 	border-radius: 5px;
+}
+
+#footer {
+	text-align: center;
+	padding: 0.5rem 1rem;
+}
+
+#footer p {
+	margin: 0;
+	font: 12px 'Rubik', sans-serif;
+	color: #008080;
 }

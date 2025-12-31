@@ -3,14 +3,15 @@
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rubik:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 		<link rel="stylesheet" href="css/camden-wander.css" />
 	</head>
 	<body>
 		<canvas id="webgl-bg"></canvas>
 		<div id="title">
 			<p class="title-bar">Camden Wander</p>
-		</div>
-		<div id="subtitle" class="title_footer">
 			<p class="subtitle">Interdisciplinary Artist</p>
 		</div>
 		<div id="filters" class="content_filter">
@@ -19,9 +20,15 @@
 					<h3>Produced Tracks</h3>
 					<ul></ul>
 				</div>
-				<div id="dj-mixes" class="track-column">
-					<h3>DJ Mixes</h3>
-					<ul></ul>
+				<div class="track-column">
+					<div id="live-performances" class="track-section">
+						<h3>Live Performances</h3>
+						<ul></ul>
+					</div>
+					<div id="dj-mixes" class="track-section">
+						<h3>DJ Mixes</h3>
+						<ul></ul>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -31,6 +38,9 @@
 				<div id="timeline-played" class="timeline-played"></div>
 			</div>
 			<audio id="player"></audio>
+		</div>
+		<div id="footer">
+			<p>&copy; 2026 Camden Wander Lindahl</p>
 		</div>
 		<script src="//cdn.jsdelivr.net/npm/hls.js"></script>
 		<script src="//cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>

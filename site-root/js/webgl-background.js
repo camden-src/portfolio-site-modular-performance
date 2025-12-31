@@ -18,7 +18,10 @@
     CAMERA_Z: 10,
     CORNER_Z_FAR: -5,
     CENTER_Z_NEAR: 5,
-    FADE_ZONE: 0.15
+    FADE_ZONE: 0.15,
+    FRAME_WIDTH: 0.12,
+    FRAME_DEPTH: 0.08,
+    FRAME_COLOR: 0x5577AA
   };
 
   var CORNERS = {
@@ -86,8 +89,16 @@
   }
 
   function setupLighting() {
-    var ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+    var ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
+
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 5, 10);
+    scene.add(directionalLight);
+
+    var fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    fillLight.position.set(-3, -2, 5);
+    scene.add(fillLight);
   }
 
   function setupResizeHandler() {
@@ -176,29 +187,78 @@
     return 1.0;
   }
 
+  function setGroupOpacity(group, opacity) {
+    if (group.userData && group.userData.materials) {
+      group.userData.materials.forEach(function(mat) {
+        mat.opacity = opacity;
+      });
+    }
+  }
+
+  function createFrameMaterial() {
+    return new THREE.MeshStandardMaterial({
+      color: CONFIG.FRAME_COLOR,
+      metalness: 0.4,
+      roughness: 0.3,
+      transparent: true,
+      opacity: 0
+    });
+  }
+
   function createPlane(texture) {
     if (!texture || !texture.image) return null;
 
     var aspectRatio = texture.image.width / texture.image.height;
     var height = CONFIG.BASE_PLANE_HEIGHT;
     var width = height * aspectRatio;
+    var fw = CONFIG.FRAME_WIDTH;
+    var fd = CONFIG.FRAME_DEPTH;
 
-    var geometry = new THREE.PlaneGeometry(width, height);
-    var material = new THREE.MeshBasicMaterial({
+    var group = new THREE.Group();
+
+    var imageGeometry = new THREE.PlaneGeometry(width, height);
+    var imageMaterial = new THREE.MeshBasicMaterial({
       map: texture,
       transparent: true,
       opacity: 0,
       side: THREE.DoubleSide
     });
+    var imageMesh = new THREE.Mesh(imageGeometry, imageMaterial);
+    imageMesh.position.z = fd / 2;
+    group.add(imageMesh);
 
-    return new THREE.Mesh(geometry, material);
+    var frameMaterial = createFrameMaterial();
+
+    var topGeom = new THREE.BoxGeometry(width + fw * 2, fw, fd);
+    var topMesh = new THREE.Mesh(topGeom, frameMaterial);
+    topMesh.position.set(0, height / 2 + fw / 2, 0);
+    group.add(topMesh);
+
+    var bottomMesh = new THREE.Mesh(topGeom, frameMaterial);
+    bottomMesh.position.set(0, -height / 2 - fw / 2, 0);
+    group.add(bottomMesh);
+
+    var sideGeom = new THREE.BoxGeometry(fw, height, fd);
+    var leftMesh = new THREE.Mesh(sideGeom, frameMaterial);
+    leftMesh.position.set(-width / 2 - fw / 2, 0, 0);
+    group.add(leftMesh);
+
+    var rightMesh = new THREE.Mesh(sideGeom, frameMaterial);
+    rightMesh.position.set(width / 2 + fw / 2, 0, 0);
+    group.add(rightMesh);
+
+    group.userData.materials = [imageMaterial, frameMaterial];
+
+    return group;
   }
 
   function removePlane(plane) {
     if (plane) {
       scene.remove(plane);
-      plane.geometry.dispose();
-      plane.material.dispose();
+      plane.traverse(function(child) {
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) child.material.dispose();
+      });
     }
   }
 
@@ -239,7 +299,7 @@
 
     var startPos = currentCurve.getPoint(0);
     currentPlane.position.copy(startPos);
-    currentPlane.material.opacity = 0;
+    setGroupOpacity(currentPlane, 0);
 
     scene.add(currentPlane);
 
@@ -257,9 +317,7 @@
       var position = currentCurve.getPoint(t);
       currentPlane.position.copy(position);
 
-      currentPlane.material.opacity = calculateOpacity(t);
-
-      currentPlane.lookAt(camera.position);
+      setGroupOpacity(currentPlane, calculateOpacity(t));
 
       if (t >= 1) {
         isAnimating = false;

@@ -15,6 +15,10 @@ var producedTracks = [
   'wading-in'
 ];
 
+var livePerformances = [
+  // Add live performance folder names here
+];
+
 var djMixes = [
   // Add DJ mix folder names here
 ];
@@ -126,4 +130,5 @@ audio.addEventListener('ended', function() {
 });
 
 buildTrackList(producedTracks, 'produced-tracks', 'hls/production/');
+buildTrackList(livePerformances, 'live-performances', 'hls/live-performances/');
 buildTrackList(djMixes, 'dj-mixes', 'hls/mixes/');
