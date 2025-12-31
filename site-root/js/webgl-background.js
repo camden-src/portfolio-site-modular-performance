@@ -2,7 +2,13 @@
   'use strict';
 
   var artworkImages = [
-    // Add artwork image filenames here (e.g., 'painting-1.jpg')
+    'four-techs.jpg',
+    'gateway-to-the-giant-stairs.jpg',
+    'pareidolia-untitled.jpg',
+    'pathological-defensive-pessimism.jpg',
+    'soul-in-solstice.jpg',
+    'ten-drills.jpg',
+    'theres-no-art-in-money.jpg'
   ];
 
   var CONFIG = {
