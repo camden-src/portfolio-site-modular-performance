@@ -101,6 +101,22 @@ md-embed/
 ./md-embed/hls_metadata/launch-hls-metadata-container.sh
 ```
 
+## Publishing (publish/)
+
+Deploys site-root to Linode Object Storage via s3cmd.
+
+```
+publish/
+├── Dockerfile                  # Debian + s3cmd, developer user
+├── bucket-policy.json          # Public read policy for bucket
+├── deploy.sh                   # s3cmd sync with exclusions
+└── launch-deploy-container.sh  # Mounts ~/.s3cfg
+```
+
+```bash
+./publish/launch-deploy-container.sh
+```
+
 ## External Dependencies
 
 - HLS.js (CDN): `//cdn.jsdelivr.net/npm/hls.js` - adaptive bitrate streaming

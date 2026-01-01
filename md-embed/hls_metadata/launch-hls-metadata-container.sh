@@ -1,55 +1,48 @@
 #!/bin/bash
 set -e
 
+CONTAINER_NAME="bento4-hls"
+IMAGE_NAME="localhost/bento4-hls:latest"
 GIT_ROOT="$(git rev-parse --show-toplevel)"
 SCRIPT_DIR="$GIT_ROOT/md-embed/hls_metadata"
 
-CONTAINER_IMAGE="localhost/bento4-hls:latest"
 METADATA_DIR="${METADATA_DIR:-$SCRIPT_DIR/metadata}"
 SEGMENTS_DIR="${SEGMENTS_DIR:-$SCRIPT_DIR/segments}"
 OUTPUT_DIR="${OUTPUT_DIR:-$SCRIPT_DIR/output}"
 
+# required working directories
 if [[ ! -d "$METADATA_DIR" ]]; then
-    echo "Error: Metadata directory not found: $METADATA_DIR"
-    echo "Set METADATA_DIR environment variable or create the directory"
+    echo "Error: $METADATA_DIR not found"
     exit 1
 fi
-
 if [[ ! -d "$SEGMENTS_DIR" ]]; then
-    echo "Error: Segments directory not found: $SEGMENTS_DIR"
-    echo "Set SEGMENTS_DIR environment variable or create the directory"
+    echo "Error: $SEGMENTS_DIR not found"
     exit 1
 fi
-
 mkdir -p "$OUTPUT_DIR"
 
-if ! podman image exists "$CONTAINER_IMAGE"; then
-    echo "Error: Container image not found: $CONTAINER_IMAGE"
-    echo "Build with: podman build -t $CONTAINER_IMAGE -f \$GIT_ROOT/md-embed/hls_metadata/Dockerfile \$GIT_ROOT/md-embed/hls_metadata"
-    exit 1
+FORCE_REBUILD=false
+if [[ "$1" == "--force-rebuild" ]]; then
+    FORCE_REBUILD=true
+fi
+
+if [[ "$FORCE_REBUILD" == true ]] || ! podman image exists "$IMAGE_NAME"; then
+    podman build -t "$IMAGE_NAME" -f "$SCRIPT_DIR/Dockerfile" "$SCRIPT_DIR"
+fi
+
+if [[ "$FORCE_REBUILD" == true ]]; then
+    podman rm -f "$CONTAINER_NAME" 2>/dev/null || true
+elif podman ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+    exec podman attach "$CONTAINER_NAME"
+elif podman ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+    podman start "$CONTAINER_NAME"
+    exec podman attach "$CONTAINER_NAME"
 fi
 
 podman run --rm -it \
+    --name "$CONTAINER_NAME" \
+    --userns=keep-id \
     -v "$METADATA_DIR:/work/metadata:ro" \
     -v "$SEGMENTS_DIR:/work/segments:ro" \
     -v "$OUTPUT_DIR:/work/output:rw" \
-    --userns=keep-id \
-    "$CONTAINER_IMAGE" \
-    bash -c '
-        echo "Bento4 tools available:"
-        echo "  mp42hls  - Convert MP4 to HLS with metadata"
-        echo "  mp4info  - Display MP4 file information"
-        echo "  mp4dump  - Dump MP4 structure"
-        echo ""
-        echo "Directories mounted:"
-        echo "  /work/metadata - Metadata JSON files (read-only)"
-        echo "  /work/segments - Source HLS segments (read-only)"
-        echo "  /work/output   - Output directory (read-write)"
-        echo ""
-        echo "Example workflow:"
-        echo "  1. Review metadata: cat /work/metadata/mix-metadata.json"
-        echo "  2. Process: mp42hls --timed-metadata /work/metadata/mix-metadata.json ..."
-        echo ""
-        echo "Entering interactive shell..."
-        exec bash
-    '
+    "$IMAGE_NAME"

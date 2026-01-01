@@ -1,9 +1,15 @@
 #!/bin/bash
 set -e
 
-CONTAINER_NAME="portfolio-site-dev-sandbox"
-IMAGE_NAME="portfolio-site-dev-sandbox"
+CONTAINER_NAME="site-deploy"
+IMAGE_NAME="site-deploy"
 GIT_ROOT="$(git rev-parse --show-toplevel)"
+
+# prerequisite: ~/.s3cfg from s3cmd --configure
+if [[ ! -f "$HOME/.s3cfg" ]]; then
+    echo "Error: ~/.s3cfg not found"
+    exit 1
+fi
 
 FORCE_REBUILD=false
 if [[ "$1" == "--force-rebuild" ]]; then
@@ -11,23 +17,22 @@ if [[ "$1" == "--force-rebuild" ]]; then
 fi
 
 if [[ "$FORCE_REBUILD" == true ]] || ! podman image exists "$IMAGE_NAME"; then
-    podman build -t "$IMAGE_NAME" -f "$GIT_ROOT/Dockerfile" "$GIT_ROOT"
+    podman build -t "$IMAGE_NAME" -f "$GIT_ROOT/publish/Dockerfile" "$GIT_ROOT/publish"
 fi
 
 if [[ "$FORCE_REBUILD" == true ]]; then
     podman rm -f "$CONTAINER_NAME" 2>/dev/null || true
 elif podman ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
-    exec podman attach "$CONTAINER_NAME"
+    podman exec -it "$CONTAINER_NAME" /workspace/publish/deploy.sh
+    exit 0
 elif podman ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
     podman start "$CONTAINER_NAME"
-    exec podman attach "$CONTAINER_NAME"
+    podman exec -it "$CONTAINER_NAME" /workspace/publish/deploy.sh
+    exit 0
 fi
 
-podman run -it \
+podman run --rm \
     --name "$CONTAINER_NAME" \
-    --userns=keep-id \
-    -v "$GIT_ROOT:/workspace" \
-    -v "$HOME/.claude-container:/home/developer/.claude" \
-    -p 8080:8080 \
-    -w /workspace \
+    -v "$GIT_ROOT:/workspace:ro" \
+    -v "$HOME/.s3cfg:/home/developer/.s3cfg:ro" \
     "$IMAGE_NAME"
