@@ -1,0 +1,16 @@
+transcode/staged/**
+site-root/hls/**
+site-root/img/**
+
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.mp3
+*.wav
+*.mp4
+*.webm
+*.mov
+
+*.swp

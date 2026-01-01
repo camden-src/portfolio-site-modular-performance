@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rubik:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="css/camden-wander.css" />
+	</head>
+	<body>
+		<canvas id="webgl-bg"></canvas>
+		<div id="title">
+			<p class="title-bar">Camden Wander</p>
+			<p class="subtitle">Interdisciplinary Artist</p>
+		</div>
+		<div id="media-list" class="media-list">
+			<div class="track-columns">
+				<div id="produced-tracks" class="track-column">
+					<h3>Produced Tracks</h3>
+					<ul></ul>
+				</div>
+				<div class="track-column">
+					<div id="live-performances" class="track-section">
+						<h3>Live Performances</h3>
+						<ul></ul>
+					</div>
+					<div id="dj-mixes" class="track-section">
+						<h3>DJ Mixes</h3>
+						<ul></ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="controls" class="controls">
+			<button id="play-pause-btn" class="play-pause-btn" disabled>&#9654;</button>
+			<div id="timeline" class="timeline">
+				<div id="timeline-played" class="timeline-played"></div>
+			</div>
+			<audio id="player"></audio>
+		</div>
+		<div id="footer">
+			<p>&copy; 2026 Camden Wander Lindahl</p>
+		</div>
+		<script src="//cdn.jsdelivr.net/npm/hls.js"></script>
+		<script type="importmap">
+		{
+			"imports": {
+				"three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+			}
+		}
+		</script>
+		<script type="module" src="js/webgl-background.js"></script>
+		<script src="js/camden-wander.js"></script>
+	<body>
+</html>
