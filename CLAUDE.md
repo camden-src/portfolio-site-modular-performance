@@ -405,10 +405,11 @@ Access at: http://localhost:8080
 ```
 site-root/
 ├── index.html               # Entry point
+├── nope.html                # 404 error page (s3cmd ws-create)
 ├── css/camden-wander.css    # Styles
 ├── js/
-│   ├── camden-wander.js     # HLS player, track lists, audio analysis
-│   └── webgl-background.js  # Three.js animated background
+│   └── camden-wander.js     # HLS player, track lists, audio analysis
+├── img/                     # Artwork images
 └── hls/
     ├── production/         # Produced tracks
     │   └── {track}/master.m3u8
@@ -418,7 +419,9 @@ site-root/
         └── {performance}/master.m3u8
 ```
 
-**Key Flow:** `index.html` loads HLS.js and Three.js from CDN. `webgl-background.js` renders descending artwork frames with bass-synced rotation. `camden-wander.js` builds track lists and handles HLS playback with Web Audio API analysis for the animation.
+**Key Flow:** `index.html` loads HLS.js from CDN. `camden-wander.js` builds track lists and handles HLS playback with Web Audio API analysis.
+
+**404 Page:** `nope.html` serves as the 404 error page, configured via `s3cmd ws-create` when setting up the S3 bucket for static website hosting.
 
 ## Transcoding Workflow
 
@@ -507,10 +510,12 @@ Containerized metadata embedding tools for site media. Each tool targets a speci
 md-embed/
 ├── image_metadata/                 # Image EXIF/IPTC/XMP embedding
 │   ├── Dockerfile                  # Alpine + exiftool + jq
+│   ├── images.json                 # Metadata manifest
 │   ├── launch-image-metadata-container.sh
 │   └── embed-image-metadata.sh
 └── hls_metadata/                   # HLS timed ID3 metadata
     ├── Dockerfile                  # Bento4 build (gcc:13 base)
+    ├── audio.json                  # Metadata manifest
     └── launch-hls-metadata-container.sh
 ```
 
@@ -526,7 +531,10 @@ Embeds EXIF/IPTC/XMP metadata into artwork images using exiftool.
 ./md-embed/image_metadata/launch-image-metadata-container.sh --force-rebuild
 ```
 
-**Manifest:** `site-root/img/images.json`
+**Manifest:** `md-embed/image_metadata/images.json`
+
+The manifest defines metadata to be embedded into artwork images in `site-root/img/`.
+
 ```json
 {
   "artist": "Artist Name",
@@ -554,14 +562,17 @@ Tags artwork with:
 
 Injects timed ID3 metadata into HLS MPEG-TS segments using Bento4. Used for DJ mix track attribution where artist/title/Discogs links are embedded at specific timestamps within segments containing copyrighted material.
 
+**Manifest:** `md-embed/hls_metadata/audio.json`
+
+The manifest defines timed ID3 metadata to be injected into HLS segments in `site-root/hls/`.
+
 **Usage:**
 ```bash
-# Create required directories
-mkdir -p md-embed/hls_metadata/metadata
+# Create required directories for source segments
 mkdir -p md-embed/hls_metadata/segments
 
-# Place metadata JSON in metadata/
 # Place source HLS segments in segments/
+# Edit audio.json manifest to define metadata
 
 # Launch container (builds on first run)
 ./md-embed/hls_metadata/launch-hls-metadata-container.sh
@@ -571,7 +582,7 @@ mkdir -p md-embed/hls_metadata/segments
 ```
 
 Container mounts:
-- /work/metadata (read-only) - Metadata JSON files
+- /work/metadata (read-only) - Maps to md-embed/hls_metadata/ (includes audio.json)
 - /work/segments (read-only) - Source HLS segments
 - /work/output (read-write) - Output directory
 
@@ -672,14 +683,26 @@ publish/
 └── launch-deploy-container.sh  # Mounts ~/.s3cfg
 ```
 
+**Deployment:**
 ```bash
 ./publish/launch-deploy-container.sh
 ```
 
+The deployment script (`deploy.sh`) syncs `/workspace/site-root/` to S3 with exclusions:
+- `*.md` - Markdown documentation files
+- Metadata manifests are stored in `/workspace/md-embed/` and not part of site-root deployment
+
+**Initial Setup:**
+The S3 bucket is configured for static website hosting using `s3cmd ws-create`:
+```bash
+s3cmd ws-create --ws-index=index.html --ws-error=nope.html s3://camden-wander/
+```
+
+This configures `index.html` as the default index page and `nope.html` as the 404 error page.
+
 ## External Dependencies
 
 - HLS.js (CDN): `//cdn.jsdelivr.net/npm/hls.js` - adaptive bitrate streaming
-- Three.js (CDN): `//cdn.jsdelivr.net/npm/three@0.160.0` - WebGL 3D graphics
 - Google Fonts: Orbitron (titles), Rubik (body text)
 
 ## Color Scheme
@@ -688,14 +711,6 @@ publish/
 - **Purple** `#9400D3` - Accent shadows, active states
 - **Gold** `#FFD700` / `#CC9900` - Hover states, timeline
 - **Dark background** `#0F0D08`
-- **Copper frames** `#B87333` - WebGL picture frames
-
-## WebGL Animation
-
-- Descending artwork with copper beveled frames
-- Wide spotlight illumination from camera position
-- Bass-synced Y-axis rotation (bins 4-6), 1 rotation/sec default
-- Rule of thirds: rotate in top/bottom thirds, pause facing camera in middle
 
 ## No Build/Test/Lint
 
