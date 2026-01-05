@@ -756,11 +756,16 @@ Track lists use SVG-based trapezoid buttons organized in asymmetric groups with 
 - **DJ Mixes (Vinyl)** - Left-aligned (track-group-left)
 
 **Responsive Layout:**
-- **Wide screens:** Track groups flex side-by-side in a row (staggered appearance)
-- **Medium screens:** Track groups wrap and stack vertically (min-width: 300px per group)
+- **Wide screens (> 1080px):** Track groups flex side-by-side with row-gap: 100px between rows
+  - Releases (left-aligned)
+  - Performances (right-aligned, margin-top: 100px from container top)
+  - DJ Mixes wraps to second row with 100px gap from Releases bottom
+- **Narrow screens (≤ 1080px):** Track groups stack vertically with 4px gap between groups
+  - Performances margin-top removed (uses 4px gap)
 - **All screens:** Items maintain their alignment within containers
   - Left-aligned: positioned from left edge, overflow to the right if too wide
   - Right-aligned: positioned from right edge, overflow to the left if too wide
+  - Track groups use `flex: min-content` and `max-width: calc(50% - 1rem)` for wrapping behavior
 
 **Dynamic SVG Sizing:**
 Each track is rendered as an `<a class="track-item">` containing an SVG with dynamically calculated dimensions:
@@ -787,8 +792,29 @@ Section headers use fixed-width SVGs with the same trapezoid geometry patterns.
 **Color Scheme:**
 - **Section Headers** (static, no hover): Teal fill (#008080), purple text (#8400C3), Orbitron 24px bold
 - **Track Items** (default): Teal fill (#008080), purple text (#8400C3), Orbitron 18px
-- **Track Items** (hover): Teal fill with yellow drop shadow (drop-shadow(0 0 8px #FFFF00)), yellow text (#FFFF00)
+- **Track Items** (hover): Teal fill with yellow drop shadow (drop-shadow(0 0 8px #FFFF00)), yellow text (#FFFF00), cursor: pointer
 - **Track Items** (active/playing): Purple fill (#8400C3) with yellow drop shadow, yellow text (#FFFF00)
+
+### Play/Pause Button
+
+SVG-based trapezoid button matching track item design aesthetic:
+
+- **Geometry:** Fixed 160×30px SVG with polygon points `0,30 60,0 100,0 160,30`
+- **Default state:** Purple fill (#8400C3), teal stroke (#00B0B0), bright teal text (#00D0D0)
+- **Playing state:** Purple fill (#8400C3), yellow stroke (#FFFF00), yellow text (#FFFF00)
+- **Hover:** Flash animation (opacity 1 → 0.5 → 1 at 0.5s interval)
+- **Disabled:** 50% opacity, default cursor
+- **Text:** Play icon (▶) or Pause icon (⏸), centered via text-anchor: middle
+
+### Timeline
+
+Progress bar with trapezoid clip-path:
+
+- **Geometry:** `clip-path: polygon(0px 0px, 20px 10px, 100% 100%, calc(100% - 20px) 0%)`
+- **Background:** Yellow (#FFFF00)
+- **Played portion:** Purple (#8400C3)
+- **Height:** 10px
+- **Behavior:** Click to seek
 
 ### Bitmap Background Animation
 
@@ -797,11 +823,13 @@ Section headers use fixed-width SVGs with the same trapezoid geometry patterns.
 **Current Bitmap:** `pathological-defensive-pessimism.gif`
 
 **Canvas Setup:**
-- Fixed position canvas (`#bitmap-bg`) at z-index: -1
-- Full viewport coverage (100% width/height)
+- Absolute position canvas (`#bitmap-bg`) at z-index: -1 (scrolls with page)
+- Canvas width matches viewport width
+- Canvas height matches full document scroll height (expands to bottom of content)
 - 30% opacity for subtle background effect
 - `image-rendering: pixelated` to preserve bitmap aesthetic
-- Scales to cover viewport (maintains aspect ratio)
+- Image renders at fixed 2x scale (original pixel size × 2)
+- Image centered with negative offsets, cropping edges for blockier aesthetic
 
 **Color Cycling (bitmap-background.js):**
 - 20-second period (PERIOD = 20000ms)
@@ -816,10 +844,12 @@ Section headers use fixed-width SVGs with the same trapezoid geometry patterns.
 
 **Rendering:**
 - Loads GIF, captures original image data
+- Canvas resizes to match viewport width and full document height
+- Image renders at fixed 2x scale (not responsive to canvas size)
 - Per-frame: applies current color to pixel brightness values
 - Uses OffscreenCanvas for color transformation
 - requestAnimationFrame for smooth 60fps animation
-- Window resize handling to maintain full coverage
+- Window resize updates canvas dimensions but preserves image scale and aspect ratio
 
 **Future Enhancement:**
 - Multiple bitmap layers
