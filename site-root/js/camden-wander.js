@@ -7,82 +7,17 @@ var timelinePlayed = document.getElementById('timeline-played');
 
 var PLAY_ICON = '\u25B6';   // ▶
 var PAUSE_ICON = '\u23F8';  // ⏸
-var INFO_ICON = 'i';
+var INFO_ICON = '\u24D8';
 var CLOSE_ICON = '\u00D7';  // ×
 
 var currentTrackData = null;
 var tracks = null;
-
-// Web Audio API for bass frequency analysis
-var audioContext = null;
-var analyser = null;
-var dataArray = null;
-var audioSource = null;
-
-function initAudioAnalysis() {
-  if (audioContext) return;
-
-  audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  analyser = audioContext.createAnalyser();
-  analyser.fftSize = 256;
-
-  audioSource = audioContext.createMediaElementSource(audio);
-  audioSource.connect(analyser);
-  analyser.connect(audioContext.destination);
-
-  dataArray = new Uint8Array(analyser.frequencyBinCount);
-}
-
-// Export audio state for WebGL animation
-window.camdenAudio = {
-  isPlaying: function() {
-    return audio && !audio.paused;
-  },
-  getBassIntensity: function() {
-    if (!analyser || audio.paused) return 0;
-
-    analyser.getByteFrequencyData(dataArray);
-    var sum = 0;
-    for (var i = 4; i <= 6; i++) {
-      sum += dataArray[i];
-    }
-    return (sum / 3) / 255;
-  }
-};
 
 function formatTime(seconds) {
   if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
   var mins = Math.floor(seconds / 60);
   var secs = Math.floor(seconds % 60);
   return mins + ':' + (secs < 10 ? '0' : '') + secs;
-}
-
-function measureSvgTextWidth(text, selector) {
-  var tempAnchor = document.createElement('a');
-  tempAnchor.className = selector.replace('.', '');
-  tempAnchor.style.visibility = 'hidden';
-  tempAnchor.style.position = 'absolute';
-
-  var tempSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  var tempText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-  tempText.textContent = text;
-
-  tempSvg.appendChild(tempText);
-  tempAnchor.appendChild(tempSvg);
-  document.body.appendChild(tempAnchor);
-
-  var computedStyle = window.getComputedStyle(tempText);
-  var fontSize = computedStyle.fontSize;
-  var fontFamily = computedStyle.fontFamily;
-  var fontWeight = computedStyle.fontWeight;
-
-  document.body.removeChild(tempAnchor);
-
-  var canvas = new OffscreenCanvas(1, 1);
-  var ctx = canvas.getContext('2d');
-  ctx.font = fontWeight + ' ' + fontSize + ' ' + fontFamily;
-  var metrics = ctx.measureText(text);
-  return metrics.width;
 }
 
 function createInfoPanel(trackData) {
@@ -96,19 +31,16 @@ function createInfoPanel(trackData) {
   if (trackData.info.duration) content += 'Duration: ' + trackData.info.duration + '\n';
   if (trackData.info.style) content += 'Style: ' + trackData.info.style;
 
-  var infoText = measureSvgTextWidth(content.split('\n')[0], '.info-panel-text');
-  var panelWidth = infoText + 200;
-
   var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('width', panelWidth);
+  svg.setAttribute('width', '460');
   svg.setAttribute('height', '100');
 
   var polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-  polygon.setAttribute('points', '20,100 80,0 ' + panelWidth + ',0 ' + (panelWidth - 80) + ',100');
+  polygon.setAttribute('points', '20,100 80,0 460,0 380,100');
   polygon.setAttribute('class', 'info-panel-bg');
 
   var closeBtn = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-  closeBtn.setAttribute('x', panelWidth - 20);
+  closeBtn.setAttribute('x', 376);
   closeBtn.setAttribute('y', 20);
   closeBtn.setAttribute('class', 'info-panel-close');
   closeBtn.textContent = CLOSE_ICON;
@@ -150,16 +82,13 @@ function buildTrackItem(trackData, containerId) {
   anchor.setAttribute('data-id', trackData.id);
 
   var titleText = trackData.title;
-  var svgTextWidth = measureSvgTextWidth(titleText, '.track-item-text');
-  var iconWidth = 60;
-  var svgTrapezoidWidth = svgTextWidth + iconWidth + 168;
 
   var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('width', svgTrapezoidWidth);
+  svg.setAttribute('width', 460);
   svg.setAttribute('height', 30);
 
   var polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-  polygon.setAttribute('points', '20,30 80,0 ' + svgTrapezoidWidth + ',0 ' + (svgTrapezoidWidth - 80) + ',30');
+  polygon.setAttribute('points', '80,30 0,0 380,0 460,30');
   polygon.setAttribute('class', 'track-item-bg');
 
   var infoIcon = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -175,7 +104,7 @@ function buildTrackItem(trackData, containerId) {
   playIcon.textContent = PLAY_ICON;
 
   var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-  text.setAttribute('x', 84 + iconWidth);
+  text.setAttribute('x', 144);
   text.setAttribute('y', '20');
   text.setAttribute('class', 'track-item-text');
   text.setAttribute('text-anchor', 'start');
@@ -248,7 +177,6 @@ playPauseBtn.addEventListener('click', function() {
 });
 
 audio.addEventListener('play', function() {
-  initAudioAnalysis();
   playPauseBtnSvgText.textContent = PAUSE_ICON;
   playPauseBtn.classList.add('playing');
 
@@ -345,8 +273,8 @@ fetch('tracks.json')
   .then(function(response) { return response.json(); })
   .then(function(data) {
     tracks = data;
-    data.work_in_progress.forEach(function(track) {
-      buildTrackItem(track, 'work-in-progress');
+    data.musical_movements.forEach(function(track) {
+      buildTrackItem(track, 'musical-movements');
     });
     data.live_performances.forEach(function(track) {
       buildTrackItem(track, 'live-performances');

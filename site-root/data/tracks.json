@@ -1,5 +1,5 @@
 {
-  "work_in_progress": [
+  "musical_movements": [
     {
       "id": "creeping-insolence",
       "title": "Creeping Insolence",
@@ -45,7 +45,7 @@
     {
       "id": "three-wave-music-december-2024",
       "title": "Three Wave Music December 2024",
-      "hls_path": "hls/live-performances/three-wave-music-december-2024/master.m3u8",
+      "hls_path": "hls/three-wave-music-december-2024/master.m3u8",
       "info": {
         "date_recorded": "2024-12-15",
         "venue": "Three Wave Music, Brooklyn NY",
@@ -54,9 +54,9 @@
       }
     },
     {
-      "id": "modstock-woodstock-july-2025",
+      "id": "modstock-july-2025",
       "title": "Modstock Woodstock July 2025",
-      "hls_path": "hls/live-performances/modstock-woodstock-july-2025/master.m3u8",
+      "hls_path": "hls/modstock-july-2025/master.m3u8",
       "info": {
         "date_recorded": "2025-07-20",
         "venue": "Modstock Festival, Woodstock NY",

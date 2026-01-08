@@ -34,7 +34,7 @@ fi
 
 podman run -d \
     --name "$CONTAINER_NAME" \
-    -v "$GIT_ROOT/site-root:/usr/local/apache2/htdocs/public_html" \
+    -v "$GIT_ROOT/site-root:/usr/local/apache2/htdocs/synth-performance" \
     -p 8080:8080 \
     "$IMAGE_NAME"
 

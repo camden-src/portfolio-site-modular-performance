@@ -1,18 +1,8 @@
 body {
 	background-color: #00273D;
 	margin: 0;
-	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
-}
-
-#bitmap-bg {
-	position: absolute;
-	top: 0;
-	left: 0;
-	z-index: -1;
-	opacity: 0.3;
-	image-rendering: pixelated;
 }
 
 #media-list {
@@ -24,27 +14,32 @@ body {
 	padding: 2rem 1rem 0;
 }
 
-p.title-bar {
-	font: bold 36px 'Orbitron', monospace;
-	text-align: center;
-	color: #00273D;
-	background: #31EDAE;
-	border: 4px solid #FF5757;
-	padding: 1rem 2rem;
-	margin: 0 auto;
-	max-width: 600px;
-	clip-path: polygon(60px 0, calc(100% - 60px) 0, 100% 100%, 0 100%);
+.title svg polygon {
+	fill: #31EDAE;
+	stroke: #FF5757;
+	stroke-width: 4px;
 }
 
-.subtitle {
-	background-color: #5E17EB;
-	color: #E6E6E6;
+.title-fo {
+	font: 36px 'Orbitron', monospace;
+	color: #00273D;
+	margin-top: 16px;
+}
+
+.headline {
+	text-align: center;
+}
+
+.headline svg polygon {
+	fill: #5E17EB;
+	stroke: #E6E6E6;
+	stroke-width: 4px;
+}
+
+.headline-fo {
 	font: 500 16px 'Rubik', sans-serif;
-	padding: 0.5rem 4rem;
-	margin: 1rem auto;
-	max-width: 700px;
-	clip-path: polygon(80px 0, calc(100% - 80px) 0, 100% 100%, 0 100%);
-	text-align: left;
+	color: #FFF3C2;
+	margin-top: 0px;
 }
 
 .media-list {
@@ -59,18 +54,16 @@ p.title-bar {
 
 .track-group {
 	flex: 0 1 auto;
-	max-width: 600px;
-	min-width: 300px;
+	width: 480px;
 	display: flex;
 	flex-direction: column;
-	gap: 0.5rem;
-	align-items: center;
+	gap: 0.1rem;
+	text-align: center;
 }
 
 @media (max-width: 1080px) {
 	.media-list {
 		flex-direction: column;
-		gap: 2rem;
 	}
 
 	.track-group {
@@ -89,19 +82,17 @@ p.title-bar {
 	stroke-width: 4px;
 }
 
-.section-header svg text {
-	fill: #00273D;
-	font-family: 'Orbitron', sans-serif;
-	font-size: 24px;
-	font-weight: bold;
-	dominant-baseline: middle;
+.section-header-fo {
+	font: 24px 'Orbitron', sans-serif;
+	color: #00273D;
+	margin-left: 84px;
+	margin-top: 4px;
 }
 
 .track-wrapper {
 	width: 100%;
 	display: flex;
 	flex-direction: column;
-	align-items: flex-start;
 }
 
 .track-item {
@@ -109,10 +100,10 @@ p.title-bar {
 	margin-left: 4px;
 }
 
-.track-item-bg {
+.track-listing {
 	fill: #5E17EB;
 	stroke: #E6E6E6;
-	stroke-width: 2px;
+	stroke-width: 4px;
 }
 
 .track-item-text {
@@ -217,9 +208,7 @@ p.title-bar {
 	display: flex;
 	align-items: center;
 	width: 100%;
-	padding: 1rem;
 	box-sizing: border-box;
-	gap: 1rem;
 }
 
 .play-pause-btn {
@@ -232,26 +221,16 @@ p.title-bar {
 }
 
 .play-pause-btn svg polygon {
-	fill: #5E17EB;
-	stroke: #FF6B4A;
-	stroke-width: 3px;
+	fill: #FFF3C2;
+	stroke: #FF5757;
+	stroke-width: 8px;
 }
 
-.play-pause-btn svg text {
-	fill: #E6E6E6;
-	text-anchor: middle;
-	font-size: 24px;
-	font-family: 'Orbitron', sans-serif;
-}
-
-.play-pause-btn.playing svg polygon {
-	fill: #FF6B4A;
-	stroke: #FFFF00;
-	stroke-width: 3px;
-}
-
-.play-pause-btn.playing svg text {
-	fill: #1A4C4C;
+#player-text {
+	color: #5E17EB;
+	font: 24px 'Orbitron', sans-serif;
+	margin-top: -4px;
+	margin-left: 40px;
 }
 
 @keyframes flash {
@@ -274,14 +253,15 @@ p.title-bar {
 
 .timeline {
 	flex: 1;
-	height: 10px;
+	height: 30px;
 	background-color: #FFF3C2;
 	cursor: pointer;
 	position: relative;
-	clip-path: polygon(0px 0px, 20px 10px, 100% 100%, calc(100% - 20px) 0%);
+	clip-path: polygon(0px 0px, 20px 30px, 100% 100%, calc(100% - 20px) 0%);
 	font-family: 'Orbitron', sans-serif;
 	font-size: 10px;
 	color: #1A4C4C;
+	overflow: hidden;
 }
 
 .timeline::after {
@@ -304,12 +284,12 @@ p.title-bar {
 	position: absolute;
 	left: 0;
 	top: 0;
-	clip-path: polygon(0px 0px, 20px 10px, 100% 100%, calc(100% - 20px) 0%);
+	clip-path: polygon(0px 0px, 20px 30px, 100% 100%, calc(100% - 20px) 0%);
 	font-family: 'Orbitron', sans-serif;
 	font-size: 10px;
 	color: #FFF3C2;
 	text-align: right;
-	padding-right: 4px;
+	padding-right: 20px;
 	line-height: 10px;
 	overflow: hidden;
 	white-space: nowrap;
