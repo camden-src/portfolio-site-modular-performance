@@ -176,6 +176,7 @@ body {
 .info-panel {
 	margin-left: 4px;
 	margin-top: 0.5rem;
+	color: #00273D;
 }
 
 .info-panel-bg {
@@ -208,13 +209,12 @@ body {
 	display: flex;
 	align-items: center;
 	width: 100%;
-	box-sizing: border-box;
 }
 
 .play-pause-btn {
 	font-size: 24px;
 	font-family: 'Orbitron', sans-serif;
-	width: 160px;
+	width: 100px;
 	height: 30px;
 	cursor: pointer;
 	display: flex;
@@ -260,7 +260,7 @@ body {
 	clip-path: polygon(0px 0px, 20px 30px, 100% 100%, calc(100% - 20px) 0%);
 	font-family: 'Orbitron', sans-serif;
 	font-size: 10px;
-	color: #1A4C4C;
+	color: #5E17EB;
 	overflow: hidden;
 }
 
@@ -272,7 +272,7 @@ body {
 	transform: translateY(-50%);
 	font-family: 'Orbitron', sans-serif;
 	font-size: 10px;
-	color: #1A4C4C;
+	color: #5E17EB;
 	white-space: nowrap;
 	pointer-events: none;
 }
@@ -297,7 +297,6 @@ body {
 
 #footer {
 	text-align: center;
-	padding: 0.5rem 1rem;
 }
 
 #footer p {

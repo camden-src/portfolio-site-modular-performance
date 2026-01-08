@@ -1,67 +1,67 @@
 {
-  "musical_movements": [
+  "movements": [
     {
       "id": "creeping-insolence",
       "title": "Creeping Insolence",
-      "hls_path": "hls/creeping-insolence/master.m3u8",
+      "hlsPath": "hls/creeping-insolence/master.m3u8",
       "info": {
-        "date_recorded": "2024-12-01",
+        "dateRecorded": "2025-12-01",
         "duration": "5:23",
-        "style": "ambient, experimental"
+        "style": ""
       }
     },
     {
       "id": "multiplicitous-incidents-of-trauma",
-      "title": "Multiplicitous Incidents Of Trauma",
-      "hls_path": "hls/multiplicitous-incidents-of-trauma/master.m3u8",
+      "title": "Incidents Of Trauma",
+      "hlsPath": "hls/multiplicitous-incidents-of-trauma/master.m3u8",
       "info": {
-        "date_recorded": "2024-11-15",
+        "dateRecorded": "2025-11-25",
         "duration": "6:12",
-        "style": "dark ambient, industrial"
+        "style": ""
       }
     },
     {
       "id": "rude-introduction",
       "title": "Rude Introduction",
-      "hls_path": "hls/rude-introduction/master.m3u8",
+      "hlsPath": "hls/rude-introduction/master.m3u8",
       "info": {
-        "date_recorded": "2024-10-20",
+        "dateRecorded": "2025-11-20",
         "duration": "4:58",
-        "style": "techno, modular"
+        "style": ""
       }
     },
     {
       "id": "wading-in",
       "title": "Wading In",
-      "hls_path": "hls/wading-in/master.m3u8",
+      "hlsPath": "hls/wading-in/master.m3u8",
       "info": {
-        "date_recorded": "2024-09-30",
+        "dateRecorded": "2025-11-22",
         "duration": "7:45",
-        "style": "ambient, drone"
+        "style": ""
       }
     }
   ],
-  "live_performances": [
+  "performances": [
     {
       "id": "three-wave-music-december-2024",
-      "title": "Three Wave Music December 2024",
-      "hls_path": "hls/three-wave-music-december-2024/master.m3u8",
+      "title": "December 2024",
+      "hlsPath": "hls/three-wave-music-december-2024/master.m3u8",
       "info": {
-        "date_recorded": "2024-12-15",
-        "venue": "Three Wave Music, Brooklyn NY",
+        "dateRecorded": "2024-12-14",
+        "venue": "Three Wave Music, Midland Park, NJ",
         "duration": "25:00",
-        "style": "live modular, improvisation"
+        "style": ""
       }
     },
     {
       "id": "modstock-july-2025",
-      "title": "Modstock Woodstock July 2025",
-      "hls_path": "hls/modstock-july-2025/master.m3u8",
+      "title": "July 2025",
+      "hlsPath": "hls/modstock-july-2025/master.m3u8",
       "info": {
-        "date_recorded": "2025-07-20",
-        "venue": "Modstock Festival, Woodstock NY",
+        "dateRecorded": "2025-07-11",
+        "venue": "Station Bar & Curio, Woodstock NY",
         "duration": "30:00",
-        "style": "live modular, eurorack"
+        "style": ""
       }
     }
   ]
