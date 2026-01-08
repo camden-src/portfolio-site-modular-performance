@@ -32,14 +32,6 @@ This allows working on multiple projects in separate container sessions.
 - **Development Server:** Apache httpd (Alpine-based, serves site-root on port 8080)
 - **Deployment:** Debian slim with s3cmd (publishes to Linode Object Storage)
 
-**Claude Code Development:**
-- **Claude Code Container:** Generalized development environment (can work on any project)
-- **Multiple Instances:** Different projects can have separate container sessions simultaneously
-
-**Out of Scope (moved to `/workspace/scope-creep/`):**
-Containerized workflows for transcoding and metadata embedding have been moved to `/workspace/scope-creep/` as they are out of scope for this focused live performance portfolio. Each subdirectory in `/workspace/scope-creep/` contains its own CLAUDE.md with usage examples following project-wide container standards (Podman, uid 1000, minimal base images, launch scripts with `--force-rebuild` support).
-**[EDIT]:** 2026-01-07: /workspace/scope-creep removed, remove from context
-
 ## Project Overview
 
 Static HTML5 portfolio site for electronic music artist Camden Wander, featuring live performances of original compositions created with Eurorack modular synthesizers and other hardware instruments. HLS (HTTP Live Streaming) audio playback facilitated with HLS.js loaded from CDN.
@@ -72,17 +64,16 @@ The server mounts `site-root/` to `/usr/local/apache2/htdocs/synth-performance` 
 site-root/
 ├── index.html                   # Home page
 ├── nope.html                    # 404 error page (s3cmd ws-create)
-├── data/tracks.json             # Track metadata (JSON, non-sensitive)
 ├── css/camden-wander.css
 ├── js/camden-wander.js          # HLS player, track lists from JSON, info panel toggle
 ├── img/                         # Images
 └── hls/
-    └── {track_name}/master.m3u8 # Work in progress tracks (~5min movements)
+    └── {track_name}/master.m3u8 # HLS trancoded audio manifests and ts segments at 3 bit rates
 ```
 
-**Key Flow:** `index.html` loads HLS.js from CDN and `tracks.json`. `camden-wander.js` fetches track metadata from JSON, builds interactive track lists with info panels, and handles HLS playback and timeline.
+**Key Flow:** `index.html` loads HLS.js from CDN and contains static track listings. `camden-wander.js` handles info panel toggles, HLS playback, and timeline updates.
 
-**Data-Driven:** All track metadata is defined in `tracks.json`. The JavaScript dynamically generates track lists, info panels, and handles playback based on this JSON data source.
+**Static Architecture:** Track listings are written directly in `index.html` as `<li>` elements. JavaScript attaches event listeners to these static elements for interactivity. Track metadata in `tracks.json` is reference data only.
 
 **Cache Busting:** `index.html` contains `CACHE_VERSION` placeholders in CSS and JS URLs (`?v=CACHE_VERSION`). The deployment script replaces these with Unix timestamps to force browser cache invalidation.
 
@@ -92,7 +83,7 @@ site-root/
 
 ### Track Metadata (tracks.json)
 
-All track information is stored in `/workspace/site-root/data/tracks.json`:
+All track information is currently stored in `/workspace/site-root/data/tracks.json`:
 
 ```json
 {
@@ -123,7 +114,7 @@ All track information is stored in `/workspace/site-root/data/tracks.json`:
   ]
 }
 ```
-**[REFACTOR]:** 2026-01-07: refactor JSON object schema to camelCased property names; refactor to new location of JSON in site-root/data/tracks.json
+**[COMPLETED 2026-01-08]:** Refactored from dynamic JS track generation to static HTML track listings. Track data is now manually maintained in `index.html` as `<li class="track-item">` and `<li class="track-info-panel">` elements.
 
 ## Publishing
 
@@ -179,7 +170,7 @@ s3cmd ws-create --ws-index=index.html --ws-error=nope.html s3://camden-wander/
   - Page background
   - Title text "Camden Wander"
   - Section heading text "Movements" and "Live Performances"
-  - Player control text/icon
+  - Info panel and "hide X" control
 - **`#31EDAE`** "Soft teal" in Canva
   - Title SVG polygon background fill
   - Section headers SVG polygon fill
@@ -187,6 +178,7 @@ s3cmd ws-create --ws-index=index.html --ws-error=nope.html s3://camden-wander/
   - Subtitle SVG polygon fill
   - Track listing SVG polygon fill
   - Timeline "played portion" SVG polygon fill
+  - Main player control text/icon
 - **`#FF5757`** "Coral red" in Canva
   - Title SVG polygon stroke
   - Section headings SVG polygon stroke
@@ -196,6 +188,7 @@ s3cmd ws-create --ws-index=index.html --ws-error=nope.html s3://camden-wander/
 - **`#FFF3C2`** "Light lemon" in Canva
   - Info panel SVG polygon fill
   - Timeline "queued portion" SVG polygon fill
+  - `.track-item` class `color:` attribute: all text in track-item
 
 ## UI Layout
 
@@ -221,41 +214,58 @@ When window ≤1080px, sections are centered and stacked vertically, with "Movem
 
 ### Track Listing
 
-...
+**[COMPLETED 2026-01-08]:** Track listings now use static `<li>` elements:
+- Each track has `<li class="track-item">` with data attributes (`data-id`, `data-src`)
+- Contains `<a class="track-queuer">` (play icon), `<a class="track-info-toggle">` (info icon), and `<span class="track-name">` (title)
+- Each track has companion `<li class="track-info-panel">` with `data-track-id` attribute
+- Info panels are `display: none` by default, revealed with max-height animation
 
 ### Info Panels
 
-Toggleable dropdown panels below each track:
+Toggleable dropdown panels below each item containing an anchor including a class suffixed with "-info-toggle":
 
-- Shows: date recorded, venue (for live performances), duration, style tags
-- Close icon ("×") in top-right corner
-- Rubik medium font
-- Clicking info icon or close icon toggles visibility
-- Other tracks shift down when info panel opens
+- Animate reveal of info pannel, with the appearance that it is descending "bottom first" from the element containing the activated "info" button like an old projector screen
+- Animate obfuscation of info panel, with the appearance that it is ascending, disappearing "top first" behind the element with the associated "info" button
+- Hide control ("hide" +  "X") with margin-top: 4px and margin-right: 4px: use Rubik for "hide" with text-decoration, Orbitron for "X" with no text decoration
+- Rubik medium font for info panel prose
+- Clicking the icon info in the "activating element" or the "hide X" link toggles visibility
+- Other page elements shift down when info panel opens
+- Toggleable info page elements are static items, rendered on load, but hidden until activated
+
+**[COMPLETED 2026-01-08]:** Info panels implemented with:
+- Max-height CSS transitions for "projector screen" reveal/hide animation
+- `<a class="info-panel-close">` with "hide X" control
+- Toggle via info icon or close control
+- Static elements rendered on load, hidden by default
 
 ### Play/Pause Button
 
 SVG-based trapezoid button:
 
-- **Default:** Purple fill, orange stroke, light gray play icon
-- **Playing:** Orange fill, yellow stroke, dark teal pause icon
 - **Hover:** Flashing animation
 - **Disabled:** 50% opacity
 - Orbitron font, 24px
+- Current visible "control" toggles between the Unicode "play symbol" and "pause" symbol depending on state of player
 
 ### Timeline
 
 Progress bar with trapezoid clip-path:
 
-- **Background:** Cream/beige (#F5E6D3)
-- **Played portion:** Purple (#8400C3)
+- **Background:** Light lemon (#FFF3C2)
+- **Played portion:** Purple (#5E17EB)
 - **Height:** 30px
 - **Behavior:** Click to seek
 - **Dynamic Text:**
-  - Played section (right-justified): Time played + track title (when past 50%)
-  - Unplayed section (left-justified): Track title + time remaining (when before 50%)
-  - Text appears/disappears based on available space
-  - Orbitron font, 10px
+  - Track data is superimposed on the timeline, vertically aligned in the middle of the timeline, with track name and duration appearing "mirrored" with respect to the right edge of the "played" element
+  - Played section (right-justified with a 16px margin-right to container): Track title (sourced from HLS reading segment metadata) + duration played
+  - Unplayed section (left-justified to right edge of "time-played" element, 16px padding-left to current right edge of "played" element): Duration remaining + track title (sourced from HLS reading segment metadata)
+  - Text appears/disappears based on available space (overflow is clipped on each side)
+  - Orbitron font, 12px
+
+**[COMPLETED 2026-01-08]:** Timeline text displays track title on both sides:
+- Played portion (right side): "Title -2:30" (time remaining with minus sign)
+- Unplayed portion (left side): "5:23 Title" (time played without minus sign)
+- Text visibility based on available width (120px threshold)
 
 ## No Build/Test/Lint
 
