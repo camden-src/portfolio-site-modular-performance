@@ -42,7 +42,6 @@ body {
 	font: 500 16px 'Rubik', sans-serif;
 	width: 100%;
 	height: 100%;
-	margin: auto;
 	color: #EEE;
 }
 
@@ -233,9 +232,9 @@ p.title {
 
 .info-panel-content p {
 	margin: 2px 0px 0px 0px;
-	font-family: 'Orbitron', monospace;
-	font-size: 14px;
-	font-weight: 500;
+	font-family: 'Rubik', sans-serif;
+	font-size: 10px;
+	font-weight: 300;
 	color: #022;
 }
 
