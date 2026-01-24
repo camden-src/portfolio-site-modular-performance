@@ -13,3 +13,5 @@ site-root/img/**
 *.mov
 
 *.swp
+
+.claude*
